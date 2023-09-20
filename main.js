@@ -14,7 +14,7 @@ const todosSchemaProperties = {
 const todoSchema = {
     type: 'object',
     properties: todosSchemaProperties,
-    required: ['id','todo','userId','completed']
+    required: ['id','userId']
 }
 const todosSchemaAll = {
     type: 'object',
@@ -95,4 +95,58 @@ describe("FT_002_todos_API",function(){
             expect(result.body).have.jsonSchema(todoDeleteSchema)
         })
     })
+    describe("TD_009 Mencoba menambahkan data tanpa input data",function(){
+        it ("Menampilkan status:400" ,async function(){
+            const result = await request.post('/todos/add').send()
+            expect(result.status).to.equal(400)
+        })
+        it ("Menampilkan message:User id is required" ,async function(){
+            const result = await request.post('/todos/add').send()
+            expect(result.body.message).to.equal("User id is required")
+        })
+    })
+    describe("TD_010 Mencoba menambahkan data tanpa input userId",function(){
+        const data ={
+        todo: 'Monday left me broken',
+        completed: false,
+        }
+        it ("Menampilkan status:400" ,async function(){
+            const result = await request.post('/todos/add').send(data)
+            expect(result.status).to.equal(400)
+        })
+        it ("Menampilkan message:User id is required" ,async function(){
+            const result = await request.post('/todos/add').send(data)
+            expect(result.body.message).to.equal("User id is required")
+        })
+    })
+    describe("TD_011 Mencoba menambahkan data tanpa input todo",function(){
+        const data ={
+        completed: false,
+        userId:5,
+        }
+        it ("Menampilkan data"+
+        " completed: "+data.completed+ ","+
+        " userId: "+data.userId ,async function(){
+            const result = await request.post('/todos/add').send(data)
+            expect(result.body).have.jsonSchema(todoSchema)
+        })
+    })
+     describe("TD_012 Mencoba menambahkan data tanpa input completed",function(){
+        const data ={
+        todo: 'Monday left me broken',
+        userId:5,
+        }
+        it ("Menampilkan data todo: "+data.todo+ ","+
+        " userId: "+data.userId ,async function(){
+            const result = await request.post('/todos/add').send(data)
+            expect(result.body).have.jsonSchema(todoSchema)
+        })
+
+    })
 })
+/* async function main(){
+    const res = await request.post('/todos/add').send()
+    console.log(res.status)
+    console.log(res._body)
+}
+main() */
